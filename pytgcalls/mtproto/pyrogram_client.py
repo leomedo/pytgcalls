@@ -235,7 +235,7 @@ class PyrogramClient(BridgedClient):
         chat = await self._app.resolve_peer(chat_id)
         if isinstance(chat, InputPeerChannel):
             input_call = (
-                await self._app.invoke(
+                await self._app.send(
                     GetFullChannel(
                         channel=InputChannel(
                             channel_id=chat.channel_id,
@@ -246,13 +246,13 @@ class PyrogramClient(BridgedClient):
             ).full_chat.call
         else:
             input_call = (
-                await self._app.invoke(
+                await self._app.send(
                     GetFullChat(chat_id=chat.chat_id),
                 )
             ).full_chat.call
         if input_call is not None:
             call: GroupCall = (
-                await self._app.invoke(
+                await self._app.send(
                     GetGroupCall(
                         call=input_call,
                         limit=-1,
@@ -286,7 +286,7 @@ class PyrogramClient(BridgedClient):
                 'raise_hand_rating': participant.raise_hand_rating,
                 'left': participant.left,
             } for participant in (
-                await self._app.invoke(
+                await self._app.send(
                     GetGroupParticipants(
                         call=input_call,
                         ids=[],
@@ -308,7 +308,7 @@ class PyrogramClient(BridgedClient):
     ) -> dict:
         chat_call = await self._cache.get_full_chat(chat_id)
         if chat_call is not None:
-            result: Updates = await self._app.invoke(
+            result: Updates = await self._app.send(
                 JoinGroupCall(
                     call=chat_call,
                     params=DataJSON(data=json.dumps(json_join)),
@@ -358,7 +358,7 @@ class PyrogramClient(BridgedClient):
     ):
         chat_call = await self._cache.get_full_chat(chat_id)
         if chat_call is not None:
-            await self._app.invoke(
+            await self._app.send(
                 LeaveGroupCall(
                     call=chat_call,
                     source=0,
@@ -373,7 +373,7 @@ class PyrogramClient(BridgedClient):
     ):
         chat_call = await self._cache.get_full_chat(chat_id)
         if chat_call is not None:
-            await self._app.invoke(
+            await self._app.send(
                 EditGroupCallParticipant(
                     call=chat_call,
                     participant=participant,
@@ -391,7 +391,7 @@ class PyrogramClient(BridgedClient):
     ):
         chat_call = await self._cache.get_full_chat(chat_id)
         if chat_call is not None:
-            await self._app.invoke(
+            await self._app.send(
                 EditGroupCallParticipant(
                     call=chat_call,
                     participant=participant,
@@ -411,7 +411,7 @@ class PyrogramClient(BridgedClient):
         return await self._app.resolve_peer(user_id)
 
     async def get_id(self) -> int:
-        return (await self._app.get_me()).id
+        return (await self._app.get_me())['id']
 
     def is_connected(self) -> bool:
         return self._app.is_connected
